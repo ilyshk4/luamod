@@ -1,0 +1,20 @@
+<Mod>
+	<Name>Lua Scripting Mod</Name>
+	<Author>ilyshk4</Author>
+	<Version>1.0.7</Version>
+	<Description>A pretty powerful tool to create advanced machines using Lua scripts with multiplayer support.</Description>
+	<Icon name="icon" />
+	<WorkshopThumbnail name="icon" />
+	<MultiplayerCompatible>true</MultiplayerCompatible>
+	<Assemblies>
+		<Assembly path="Main.dll" />
+	</Assemblies>
+	<Resources>
+		<Texture name="background" path="background.png" />
+		<Texture name="background-darker" path="background-darker.png" />
+		<Texture name="hover" path="hover.png" />
+		<AudioClip name="error" path="error.wav" />
+		<Texture name="icon" path="icon.png" />
+	</Resources>
+<ID>479ad767-c2b6-4ce8-8a21-d57ecd0c5f2f</ID>
+</Mod>
