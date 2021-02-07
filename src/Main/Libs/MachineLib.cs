@@ -30,7 +30,9 @@ namespace LuaScripting.Libs
                 if (pl.Player == null || (pl.Player != null && pl.Player.IsLocalPlayer))
                 {
                     if (!state)
+                    {
                         keyEmulators.Clear();
+                    }
                 }
             };
             
@@ -58,7 +60,7 @@ namespace LuaScripting.Libs
                     string key = lua.L_CheckString(1);
                     int index = lua.L_OptInt(2, 0);
 
-                    if (LuaScripting.localMachineBlockRefs.TryGetValue(key, out List<Block> b))
+                    if (LuaScripting.Instance.localMachineBlockRefs.TryGetValue(key, out List<Block> b))
                     {
                         if (index < b.Count)
                         {
@@ -241,12 +243,12 @@ namespace LuaScripting.Libs
         {
             string key = lua.L_CheckString(1);
 
-            if (!LuaScripting.localMachineBlockRefs.ContainsKey(key))
+            if (!LuaScripting.Instance.localMachineBlockRefs.ContainsKey(key))
             {
                 return lua.ReturnError(0, "there is no block with key: " + key);
             }
 
-            List<Block> blocks = LuaScripting.localMachineBlockRefs[key]; 
+            List<Block> blocks = LuaScripting.Instance.localMachineBlockRefs[key]; 
 
             CSharpFunctionDelegate setSliderValue = (state) =>
             {
@@ -258,8 +260,11 @@ namespace LuaScripting.Libs
 
                     MapperType mapperType = b.InternalObject.SimBlock.GetMapperType("bmt-" + mapperKey);
                     if (mapperType == null)
+                        mapperType = b.InternalObject.SimBlock.GetMapperType(mapperKey);
+
+                    if (mapperType == null)
                     {
-                        ModNetworking.SendToHost(Mod.setSliderValueMsg.CreateMessage(new object[]
+                        ModNetworking.SendToHost(Mod.netMsgSliderValue.CreateMessage(new object[]
                         {
                             b, Utils.GetStableHashCode(mapperKey), value
                         }));
@@ -271,13 +276,47 @@ namespace LuaScripting.Libs
                         slider.ApplyValue();
                     }
                 }
-                return 1;
+                return 0;
+            };
+
+            CSharpFunctionDelegate setSteering = (state) =>
+            {
+                float angle = (float) lua.L_CheckNumber(1); 
+
+                foreach (Block b in blocks)
+                {
+                    if (b.InternalObject is SteeringWheel)
+                    {
+                        SteeringWheel steeringWheel = b?.SimBlock?.InternalObject as SteeringWheel;
+
+                        if (steeringWheel != null)
+                        {
+                            if (!steeringWheel.noRigidbody)
+                            {
+                                steeringWheel.AngleToBe = angle;
+                            } else
+                            {
+                                ModNetworking.SendToHost(Mod.netMsgSetSteering.CreateMessage(new object[]
+                                {
+                                    b, angle
+                                }));
+                            }
+                        }
+                    } else
+                    {
+                        Debug.Log($"[LuaScripting] There is no steering wheel on {b}.");
+                    }
+                }
+                return 0;
             };
 
             lua.NewTable(); //2, 1);
 
             lua.PushCSharpFunction(setSliderValue);
             lua.SetField(-2, "set_slider");
+
+            lua.PushCSharpFunction(setSteering);
+            lua.SetField(-2, "set_steering");
             return 1;
         }
 
@@ -347,8 +386,8 @@ namespace LuaScripting.Libs
 
         private static void Emulate(KeyCode key, bool emulate)
         {
-            if (LuaScripting.localMachineUsedKeys.Keys.Contains(key))
-                foreach (Block block in LuaScripting.localMachineUsedKeys[key])
+            if (LuaScripting.Instance.localMachineUsedKeys.Keys.Contains(key))
+                foreach (Block block in LuaScripting.Instance.localMachineUsedKeys[key])
                 {
                     foreach (MapperType mapperType in block.SimBlock.InternalObject.MapperTypes)
                         if (mapperType is MKey)
@@ -358,7 +397,7 @@ namespace LuaScripting.Libs
                                 mkey.UpdateEmulation(emulate);
                         }
 
-                    ModNetworking.SendToAll(Mod.setEmulateStateMsg.CreateMessage(new object[] {
+                    ModNetworking.SendToAll(Mod.netMsgEmulateKey.CreateMessage(new object[] {
                         block, (int) key, emulate
                     }));
                 }

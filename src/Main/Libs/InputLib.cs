@@ -40,7 +40,7 @@ namespace LuaScripting.Libs
         public static int MouseRaycasyHitPoint(ILuaState lua)
         {
             RaycastHit hit;
-            Ray ray = LuaScripting.mainCamera.ScreenPointToRay(Input.mousePosition);
+            Ray ray = LuaScripting.Instance.mainCamera.ScreenPointToRay(Input.mousePosition);
 
             if (Physics.Raycast(ray, out hit))
             {

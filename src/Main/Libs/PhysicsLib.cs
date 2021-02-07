@@ -15,7 +15,7 @@ namespace LuaScripting.Libs
             {
                 new NameFuncPair("raycast", Raycast),
                 new NameFuncPair("overlap_sphere", OverlapSphere),
-
+                new NameFuncPair("gravity", Utils.CF(() => Physics.gravity)),
             };
 
             lua.L_NewLib(define);

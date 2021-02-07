@@ -44,8 +44,14 @@
     <Reference Include="UnityEngine">
       <HintPath>$(BESIEGE_UNITY_ASSEMBLIES)UnityEngine.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.UI, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Managed\UnityEngine.UI.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Libs\ChatLib.cs" />
+    <Compile Include="Libs\TTSLib.cs" />
     <Compile Include="Libs\ScreenLib.cs" />
     <Compile Include="Libs\PlayersLib.cs" />
     <Compile Include="Libs\LinesLin.cs" />

@@ -1,9 +1,11 @@
 ﻿using Modding;
 using Modding.Blocks;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using UniLua;
 using UnityEngine;
 using XMLTypes;
@@ -22,17 +24,20 @@ namespace LuaScripting
 
         private int startRef, updateRef, lateUpdate, fixedUpdateRef, onguiRef;
         private bool scriptOk;
-        private static bool markForLoadFromMachine;
+        private static bool markForLoadFromMachine = true;
 
-        public static AudioSource audioSource;
+        public List<AwaitAction> awaitActions = new List<AwaitAction>();
+        public Dictionary<string, List<Block>> localMachineBlockRefs = new Dictionary<string, List<Block>>();
+        public Dictionary<KeyCode, List<Block>> localMachineUsedKeys = new Dictionary<KeyCode, List<Block>>();
+        public Camera hudCamera;
+        public Camera mainCamera;
 
-        public static List<AwaitAction> awaitActions = new List<AwaitAction>();
-        public static Dictionary<string, List<Block>> localMachineBlockRefs = new Dictionary<string, List<Block>>();
-        public static Dictionary<KeyCode, List<Block>> localMachineUsedKeys = new Dictionary<KeyCode, List<Block>>();
-        public static Camera hudCamera;
-        public static Camera mainCamera;
+        public ChatView chatView;
+        public Transform chatViewContent;
+        private int lastChatMsgHashCode;
 
-        private static int hasErrors;
+        private int hasErrors;
+        
 
         public static GUIStyle hintStyle = new GUIStyle()
         {
@@ -58,7 +63,7 @@ namespace LuaScripting
 
         public static void AddAwaitAction(Action action, int time)
         {
-            awaitActions.Add(new AwaitAction()
+            Instance.awaitActions.Add(new AwaitAction()
             {
                 action = action,
                 fixedUpdateTicksRemain = time
@@ -67,18 +72,6 @@ namespace LuaScripting
 
         public static void Init()
         {
-            Application.logMessageReceived += (string condition, string stackTrace, LogType type) =>
-            {
-                if (stackTrace.Contains("LuaScripting"))
-                    if (type == LogType.Error)
-                    {
-                        audioSource.volume = 0.5F;
-                        if (!audioSource.isPlaying)
-                            audioSource.PlayOneShot(ModResource.GetAudioClip("error"));
-                        hasErrors = 300;
-                    }
-            };
-
             Events.OnMachineSave += (info) =>
             {
                 Mod.SaveLuaRootToMachine();
@@ -90,9 +83,10 @@ namespace LuaScripting
                 {
                     if (!state)
                     {
-                        awaitActions.Clear();
-                        localMachineBlockRefs.Clear();
-                        localMachineUsedKeys.Clear();
+                        Instance.awaitActions.Clear();
+                        Instance.localMachineBlockRefs.Clear();
+                        Instance.localMachineUsedKeys.Clear();
+                        Libs.ChatLib.chatListeners.Clear();
 
                         Cursor.visible = true;
                         Cursor.lockState = CursorLockMode.None;
@@ -109,7 +103,19 @@ namespace LuaScripting
             {
                 OnBlockInit(block);
             };
+
+            UnityEngine.SceneManagement.SceneManager.sceneLoaded += (a, b) =>
+            {
+                Instance.Start();
+            };
         }
+        //if (!targetAngleModeWarning)
+        //{
+        //    targetAngleModeWarning = true;
+        //    Debug.Log("[LuaScripting] Note that since you set the hinge angle programmatically, you will no longer be able to set the angle by input. Also, since target angle mode on this hinge is disabled besiege for some reason will start spam \"targetAngleMode??\" in console every tick causing huge lags. So, for now print, log and warning messages are disabled.");
+        //}
+        //
+        //Debug.logger.filterLogType = LogType.Error;
 
         private static void OnBlockInit(Block block)
         {
@@ -131,9 +137,9 @@ namespace LuaScripting
 
                             if (refKey != null)
                             {
-                                if (!localMachineBlockRefs.ContainsKey(refKey.Value))
-                                    localMachineBlockRefs.Add(refKey.Value, new List<Block>()); ;
-                                localMachineBlockRefs[refKey.Value].Add(b);
+                                if (!Instance.localMachineBlockRefs.ContainsKey(refKey.Value))
+                                    Instance.localMachineBlockRefs.Add(refKey.Value, new List<Block>()); ;
+                                Instance.localMachineBlockRefs[refKey.Value].Add(b);
                             }
 
                             foreach (MapperType mt in b.InternalObject.MapperTypes)
@@ -143,9 +149,9 @@ namespace LuaScripting
                                     for (int i = 0; i < mkey.KeysCount; i++)
                                     {
                                         KeyCode keyCode = mkey.GetKey(i);
-                                        if (!localMachineUsedKeys.ContainsKey(keyCode))
-                                            localMachineUsedKeys.Add(keyCode, new List<Block>());
-                                        localMachineUsedKeys[keyCode].Add(b);
+                                        if (!Instance.localMachineUsedKeys.ContainsKey(keyCode))
+                                            Instance.localMachineUsedKeys.Add(keyCode, new List<Block>());
+                                        Instance.localMachineUsedKeys[keyCode].Add(b);
                                     }
                                 }
                         }
@@ -177,6 +183,7 @@ namespace LuaScripting
             _lua.L_RequireF("lines", Libs.LinesLib.OpenLib, true);
             _lua.L_RequireF("players", Libs.PlayersLib.OpenLib, true);
             _lua.L_RequireF("screen", Libs.ScreenLib.OpenLib, true);
+            _lua.L_RequireF("chat", Libs.ChatLib.OpenLib, true);
 
             _status = _lua.L_DoFile("main.lua");
 
@@ -279,10 +286,16 @@ namespace LuaScripting
 
         private void Start()
         {
-            audioSource = gameObject.AddComponent<AudioSource>();
-            mainCamera = Camera.main;
-            hudCamera = mainCamera.transform.GetChild(0).GetComponent<Camera>();
-            
+            try
+            {
+                mainCamera = Camera.main;
+                hudCamera = mainCamera.transform.GetChild(0).GetComponent<Camera>();
+                chatView = FindObjectOfType<ChatView>();
+                chatViewContent = chatView?.transform?.GetChild(0)?.GetChild(0)?.GetChild(0)?.GetChild(0)?.GetChild(0)?.GetChild(0);
+            } catch (Exception)
+            {
+
+            }
         }
 
         private void Update()
@@ -322,6 +335,31 @@ namespace LuaScripting
 
             if (scriptOk && (Machine.Active().SimulationMachine != null))
             {
+                var chatMsg = chatViewContent?.GetChild(chatViewContent.childCount - 1)?.GetComponent<UnityEngine.UI.Text>();
+                if (chatMsg != null)
+                {
+                    if (chatMsg.GetHashCode() != lastChatMsgHashCode && chatMsg.text.Contains(":  "))
+                    {
+                        string[] sp = chatMsg.text.Split(new string[] { ":  " }, StringSplitOptions.None);
+                        if (sp.Length == 2)
+                        {
+                            string nick = Regex.Replace(sp[0], "<.*?>", String.Empty);
+                            string text = Regex.Replace(sp[1], "<.*?>", String.Empty);
+                            foreach (int fRef in Libs.ChatLib.chatListeners)
+                            {
+                                _lua.RawGetI(LuaDef.LUA_REGISTRYINDEX, fRef);
+
+                                _lua.PushString(nick);
+                                _lua.PushString(text);
+
+                                if (_lua.PCall(2, 0, 0) != ThreadStatus.LUA_OK)
+                                    Debug.LogError(_lua.ToString(-1));
+                            }
+                        }
+                    }
+                    lastChatMsgHashCode = chatMsg.GetHashCode();
+                }
+
                 CallLuaMethod(fixedUpdateRef);
 
                 foreach (AwaitAction awaitAction in awaitActions.ToArray())

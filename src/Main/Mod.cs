@@ -24,7 +24,7 @@ namespace LuaScripting
             }
 		};
 
-		public static MessageType setSliderValueMsg, setEmulateStateMsg;
+		public static MessageType netMsgSliderValue, netMsgEmulateKey, netMsgSetSteering;
 
 		public override void OnLoad()
 		{	
@@ -33,26 +33,32 @@ namespace LuaScripting
 			Libs.InputLib.Init();
 			Libs.LinesLib.Init();
 			LuaScripting.Init();
-
-			setSliderValueMsg = ModNetworking.CreateMessageType(new DataType[]
+			
+			netMsgSliderValue = ModNetworking.CreateMessageType(new DataType[]
 			{
 				DataType.Block,
 				DataType.Integer,
 				DataType.Single
 			});
 
-			setEmulateStateMsg = ModNetworking.CreateMessageType(new DataType[]
+			netMsgEmulateKey = ModNetworking.CreateMessageType(new DataType[]
 			{
 				DataType.Block,
 				DataType.Integer,
 				DataType.Boolean,
 			});
 
+			netMsgSetSteering = ModNetworking.CreateMessageType(new DataType[]
+			{
+				DataType.Block,
+				DataType.Single
+			});
+
 			ModNetworking.MessageReceived += (msg) =>
 			{
 				try
-                {
-					if (msg.Type == setSliderValueMsg)
+				{
+					if (msg.Type == netMsgSliderValue)
 					{
 						Block block = (Block) msg.GetData(0);
 						int fieldHashCode = (int) msg.GetData(1);
@@ -76,10 +82,10 @@ namespace LuaScripting
 						}
 					}
 
-					if (msg.Type == setEmulateStateMsg)
+					if (msg.Type == netMsgEmulateKey)
 					{
 						Block block = (Block) msg.GetData(0);
-						KeyCode key = (KeyCode) (int) msg.GetData(1);
+						KeyCode key = (KeyCode)(int) msg.GetData(1);
 						bool state = (bool) msg.GetData(2);
 
 						if (block != null)
@@ -93,6 +99,22 @@ namespace LuaScripting
 								}
 						}
 					}
+
+					if (msg.Type == netMsgSetSteering)
+					{
+						Block block = (Block)msg.GetData(0);
+						float value = (float)msg.GetData(1);
+
+						if (block != null)
+                        {
+							if (block.InternalObject != null && block.InternalObject is SteeringWheel)
+                            {
+								SteeringWheel sw = block.InternalObject.SimBlock as SteeringWheel;
+								sw.AngleToBe = value;
+                            }
+                        }
+					}
+
 				} catch (NullReferenceException)
                 {
 					// wellp, nothing to do here oof
