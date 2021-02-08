@@ -2,8 +2,6 @@
 
 local machine_info = machine.get_machine_info() -- lua table of functions for getting machine info or block info
 
-chat.set_visible(true)
-
 local r1 = machine.get_refs_control("r1") -- get controller of all blocks with reference key 'r1'
 local b1 = machine_info.get_block_info("b1") -- get block info with reference key 'b1'
 local s1 = 1 -- speed variable

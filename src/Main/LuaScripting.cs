@@ -20,7 +20,7 @@ namespace LuaScripting
         private ILuaState _lua;
         private ThreadStatus _status;
 
-        private Rect windowRect = new Rect(6, 70, 200, 190);
+        private Rect windowRect = new Rect(6, 70, 200, 230);
 
         private int startRef, updateRef, lateUpdate, fixedUpdateRef, onguiRef;
         private bool scriptOk;
@@ -276,7 +276,12 @@ namespace LuaScripting
                 Mod.LoadLuaRootFromMachine();
             }
 
-            if (GUI.Button(new Rect(10, 150, 180, 30), "Documentation", Libs.GUILib.buttonStyle))
+            if (GUI.Button(new Rect(10, 150, 180, 30), "Online Docs", Libs.GUILib.buttonStyle))
+            {
+                Application.OpenURL("https://github.com/ilyshk4/luamod-wiki/wiki");
+            }
+
+            if (GUI.Button(new Rect(10, 190, 180, 30), "Offline Docs", Libs.GUILib.buttonStyle))
             {
                 ModIO.OpenFolderInFileBrowser("Doc");
             }
