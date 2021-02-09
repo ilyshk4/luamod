@@ -10,51 +10,13 @@ namespace LuaScripting.Libs
 {
     public class GUILib
     {
-        public static GUIStyle labelStyle = new GUIStyle()
-        {
-            normal = {
-                    background = ModResource.GetTexture("background"),
-                    textColor = Color.white
-            },
-            font = Font.CreateDynamicFontFromOSFont("Lucida Console", 14),
-            richText = true,
-            alignment = TextAnchor.MiddleCenter,
-        };
-
-        public static GUIStyle windowStyle = new GUIStyle()
-        {
-            normal = {
-                background = ModResource.GetTexture("background"),
-                    textColor = Color.white
-            },
-            font = Font.CreateDynamicFontFromOSFont("Lucida Console", 14),
-            richText = true,
-            alignment = TextAnchor.UpperCenter,
-            padding = new RectOffset(10, 10, 10, 10),
-        };
-
-        public static GUIStyle buttonStyle = new GUIStyle()
-        {
-            normal = {
-                background = ModResource.GetTexture("background"),
-                    textColor = Color.white
-            },
-            font = Font.CreateDynamicFontFromOSFont("Lucida Console", 14),
-            richText = true,
-            alignment = TextAnchor.MiddleCenter,
-            hover = new GUIStyleState()
-            {
-                background = ModResource.GetTexture("hover"),
-                textColor = Color.white
-            }
-        };
-
         public static NameFuncPair[] define;
 
         public static void Init()
         {
             define = new NameFuncPair[]
             {
+                new NameFuncPair("Toggle", Toggle),
                 new NameFuncPair("Label", Label),
                 new NameFuncPair("Button", Button),
                 new NameFuncPair("BeginGroup", BeginGroup),
@@ -83,6 +45,7 @@ namespace LuaScripting.Libs
                 new NameFuncPair("VerticalScrollbar", VerticalScrollbar),
                 new NameFuncPair("VerticalSlider", VerticalSlider),
                 new NameFuncPair("Window", Window),
+                new NameFuncPair("WorldToScreenPoint", WorldToScreenPoint),
             };
 
             define = Utils.MakePretty(define);
@@ -99,6 +62,20 @@ namespace LuaScripting.Libs
         {
             GUI.Label(RectLib.CheckRect(lua, 1), lua.L_CheckString(2));
             return 0;
+        }
+
+        public static int WorldToScreenPoint(ILuaState lua)
+        {
+            Vector2 pos = LuaScripting.Instance.mainCamera.WorldToScreenPoint(VectorLib.CheckVector(lua, 1));
+            pos.y = Screen.height - pos.y;
+            VectorLib.PushVector(lua, pos);
+            return 1;
+        }
+
+        public static int Toggle(ILuaState lua)
+        {
+            lua.PushBoolean(GUI.Toggle(RectLib.CheckRect(lua, 1), lua.ToBoolean(2), lua.L_CheckString(3)));
+            return 1;
         }
 
         public static int Button(ILuaState lua)

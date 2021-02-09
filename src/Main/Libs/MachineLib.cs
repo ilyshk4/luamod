@@ -1,5 +1,6 @@
 ﻿using Modding;
 using Modding.Blocks;
+using Modding.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -123,6 +124,13 @@ namespace LuaScripting.Libs
             lua.PushCSharpFunction(Utils.CF(() => machine.PlayerID));
             lua.SetField(-2, "player_id");
 
+            lua.PushCSharpFunction((ll) =>
+            {
+                PlayersLib.PushPlayerInfo(ll, Player.From(machine.PlayerID));
+                return 1;
+            });
+            lua.SetField(-2, "player");
+
             lua.PushCSharpFunction(Utils.CF(() => machine.SimulationBlocks[0].transform.position));
             lua.SetField(-2, "position");
 
@@ -150,31 +158,13 @@ namespace LuaScripting.Libs
             lua.PushCSharpFunction(Utils.CF(() => (int) machine.FirstBlock.Team));
             lua.SetField(-2, "team");
 
+            lua.PushCSharpFunction(Utils.CF(() => machine.SimulationMachine != null));
+            lua.SetField(-2, "is_simulating");
         }
 
         private static int GetMachineInfo(ILuaState lua)
         {
-            if (lua.GetTop() == 0)
-                PushMachineInfo(lua, Machine.Active());
-            else if (Modding.Common.Player.GetLocalPlayer() != null)
-            {
-                if (lua.IsString(0))
-                    PushMachineInfo(lua, Modding.Common.Player.GetAllPlayers().Find(x => x.Name == lua.L_CheckString(0)).Machine.InternalObject);
-                else
-                {
-                    int i = lua.L_CheckInteger(0);
-                    PushMachineInfo(lua, Modding.Common.Player.GetAllPlayers()[i].Machine.InternalObject);
-                }
-            }
-  
-            return 1;
-        }
-        private static int GetPlayerMachineInfo(ILuaState lua)
-        {
-            int playerId = lua.L_CheckInteger(1);
-
-            PushMachineInfo(lua, Modding.Common.Player.GetAllPlayers()[playerId].Machine.InternalObject);
-
+            PushMachineInfo(lua, Machine.Active());
             return 1;
         }
 

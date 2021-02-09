@@ -1,7 +1,7 @@
 <Mod>
 	<Name>Lua Scripting Mod</Name>
 	<Author>ilyshk4</Author>
-	<Version>1.1.0</Version>
+	<Version>1.1.3</Version>
 	<Description>A pretty powerful tool to create advanced machines using Lua scripts with multiplayer support.</Description>
 	<Icon name="icon" />
 	<WorkshopThumbnail name="icon" />
@@ -10,11 +10,37 @@
 		<Assembly path="Main.dll" />
 	</Assemblies>
 	<Resources>
-		<Texture name="background" path="background.png" />
-		<Texture name="background-darker" path="background-darker.png" />
-		<Texture name="hover" path="hover.png" />
-		<AudioClip name="error" path="error.wav" />
 		<Texture name="icon" path="icon.png" />
+		<Texture name="arrow-disabled-down.png" path="UI\arrow-disabled-down.png"/>
+		<Texture name="arrow-disabled-right.png" path="UI\arrow-disabled-right.png"/>
+		<Texture name="arrow-hover-down.png" path="UI\arrow-hover-down.png"/>
+		<Texture name="arrow-hover-right.png" path="UI\arrow-hover-right.png"/>
+		<Texture name="arrow-normal-down.png" path="UI\arrow-normal-down.png"/>
+		<Texture name="arrow-normal-right.png" path="UI\arrow-normal-right.png"/>
+		<Texture name="background-44px.png" path="UI\background-44px.png"/>
+		<Texture name="background-dark.png" path="UI\background-dark.png"/>
+		<Texture name="blue-dark.png" path="UI\blue-dark.png"/>
+		<Texture name="blue-light.png" path="UI\blue-light.png"/>
+		<Texture name="blue-normal.png" path="UI\blue-normal.png"/>
+		<Texture name="blue-very-dark.png" path="UI\blue-very-dark.png"/>
+		<Texture name="button-light-grey.png" path="UI\button-light-grey.png"/>
+		<Texture name="button-red.png" path="UI\button-red.png"/>
+		<Texture name="scroll-horizontal.png" path="UI\scroll-horizontal.png"/>
+		<Texture name="scroll-thumb-active.png" path="UI\scroll-thumb-active.png"/>
+		<Texture name="scroll-thumb-hover.png" path="UI\scroll-thumb-hover.png"/>
+		<Texture name="scroll-thumb.png" path="UI\scroll-thumb.png"/>
+		<Texture name="scroll-vertical.png" path="UI\scroll-vertical.png"/>
+		<Texture name="slider-thumb-active.png" path="UI\slider-thumb-active.png"/>
+		<Texture name="slider-thumb-hover.png" path="UI\slider-thumb-hover.png"/>
+		<Texture name="slider-thumb.png" path="UI\slider-thumb.png"/>
+		<Texture name="thumb-horizontal.png" path="UI\thumb-horizontal.png"/>
+		<Texture name="thumb-vertical.png" path="UI\thumb-vertical.png"/>
+		<Texture name="toggle-active.png" path="UI\toggle-active.png"/>
+		<Texture name="toggle-hover.png" path="UI\toggle-hover.png"/>
+		<Texture name="toggle-normal.png" path="UI\toggle-normal.png"/>
+		<Texture name="toggle-on-active.png" path="UI\toggle-on-active.png"/>
+		<Texture name="toggle-on-hover.png" path="UI\toggle-on-hover.png"/>
+		<Texture name="toggle-on-normal.png" path="UI\toggle-on-normal.png"/>
 	</Resources>
 <ID>479ad767-c2b6-4ce8-8a21-d57ecd0c5f2f</ID>
 </Mod>

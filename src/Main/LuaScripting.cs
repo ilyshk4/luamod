@@ -1,5 +1,6 @@
 ﻿using Modding;
 using Modding.Blocks;
+using spaar.ModLoader.UI;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -20,7 +21,7 @@ namespace LuaScripting
         private ILuaState _lua;
         private ThreadStatus _status;
 
-        private Rect windowRect = new Rect(6, 70, 200, 230);
+        private Rect windowRect = new Rect(6, 70, 200, 254);
 
         private int startRef, updateRef, lateUpdate, fixedUpdateRef, onguiRef;
         private bool scriptOk;
@@ -35,32 +36,7 @@ namespace LuaScripting
         public ChatView chatView;
         public Transform chatViewContent;
         private int lastChatMsgHashCode;
-
-        private int hasErrors;
         
-
-        public static GUIStyle hintStyle = new GUIStyle()
-        {
-            normal = {
-                    background = ModResource.GetTexture("background-darker"),
-                    textColor = Color.white
-            },
-            font = Font.CreateDynamicFontFromOSFont("Lucida Console", 14),
-            richText = true,
-            alignment = TextAnchor.MiddleCenter,
-        };
-
-        public static GUIStyle errStyle = new GUIStyle()
-        {
-            normal = {
-                    background = ModResource.GetTexture("background"),
-                    textColor = Color.red
-            },
-            font = Font.CreateDynamicFontFromOSFont("Lucida Console", 25),
-            richText = true,
-            alignment = TextAnchor.MiddleCenter,
-        };
-
         public static void AddAwaitAction(Action action, int time)
         {
             Instance.awaitActions.Add(new AwaitAction()
@@ -218,26 +194,26 @@ namespace LuaScripting
 
         private void OnGUI()
         {
+            if (!Elements.IsInitialized)
+                Elements.RebuildElements();
+
+            GUI.skin = Mod.Skin;
+
             if (!Machine.Active())
                 return;
 
             if (SHOW_GUI)
             {
-                windowRect = GUI.Window(84475229, windowRect, DoWindow, "Lua Scripting", Libs.GUILib.windowStyle);
+                windowRect = GUI.Window(84475229, windowRect, DoWindow, "Lua Scripting");
 
                 if (BlockMapper.CurrentInstance && BlockMapper.CurrentInstance.IsBlock && BlockMapper.CurrentInstance.Block.MapperTypes.Count > 0)
                 {
                     Rect inspectorRect = windowRect;
                     inspectorRect.width = 300;
                     inspectorRect.x = windowRect.x + windowRect.width + 10;
-                    inspectorRect.height = 60 + BlockMapper.CurrentInstance.Block.MapperTypes.Count * 30;
-                    GUI.Window(84475239, inspectorRect, InspectKeysWindow, "Mapper Keys", Libs.GUILib.windowStyle);
+                    inspectorRect.height = 84 + BlockMapper.CurrentInstance.Block.MapperTypes.Count * 30;
+                    GUI.Window(84475239, inspectorRect, InspectKeysWindow, "Mapper Keys");
                 }
-            }
-
-            if (hasErrors > 0)
-            {
-                GUI.Label(new Rect(Screen.width / 2 - 240 * 3 / 2, Screen.height / 2 - 30 * 3 / 2, 240 * 3, 30 * 3), "An error occured. Check console (Ctrl + K).", errStyle);
             }
 
             if (scriptOk && (Machine.Active().SimulationMachine != null))
@@ -247,41 +223,41 @@ namespace LuaScripting
         private void InspectKeysWindow(int uselessId)
         {
             int i = 1;
-            GUI.Label(new Rect(10, 30, 135, 20), "Name", Libs.GUILib.labelStyle);
-            GUI.Label(new Rect(155, 30, 135, 20), "Key", Libs.GUILib.labelStyle);
+            GUI.Label(new Rect(10, 30 + 24, 135, 20), "Name");
+            GUI.Label(new Rect(155, 30 + 24, 135, 20), "Key");
             foreach (MapperType mt in BlockMapper.CurrentInstance.Block.MapperTypes)
             {
-                GUI.Label(new Rect(10, 30 + 30 * i, 135, 20), $"{mt.DisplayName}", Libs.GUILib.labelStyle);
-                GUI.Label(new Rect(155, 30 + 30 * i, 135, 20), $"{mt.Key}", Libs.GUILib.labelStyle);
+                GUI.Label(new Rect(10, 30 + 30 * i + 24, 135, 20), $"{mt.DisplayName}");
+                GUI.Label(new Rect(155, 30 + 30 * i + 24, 135, 20), $"{mt.Key}");
                 i++;
             }
         }
 
         private void DoWindow(int uselessId)
         {
-            if (GUI.Button(new Rect(10, 30, 180, 30), "Open LuaRoot Folder", Libs.GUILib.buttonStyle))
+            if (GUI.Button(new Rect(10, 24 + 30, 180, 30), "Open LuaRoot Folder"))
             {
                 if (!ModIO.ExistsDirectory("LuaRoot"))
                     ModIO.CreateDirectory("LuaRoot");
                 ModIO.OpenFolderInFileBrowser("LuaRoot");
             }
 
-            if (GUI.Button(new Rect(10, 70, 180, 30), "Save LuaRoot Manually", Libs.GUILib.buttonStyle))
+            if (GUI.Button(new Rect(10, 24 + 70, 180, 30), "Save LuaRoot Manually"))
             {
                 Mod.SaveLuaRootToMachine();
             }
 
-            if (GUI.Button(new Rect(10, 110, 180, 30), "Load LuaRoot Manually", Libs.GUILib.buttonStyle))
+            if (GUI.Button(new Rect(10, 24 + 110, 180, 30), "Load LuaRoot Manually"))
             {
                 Mod.LoadLuaRootFromMachine();
             }
 
-            if (GUI.Button(new Rect(10, 150, 180, 30), "Online Docs", Libs.GUILib.buttonStyle))
+            if (GUI.Button(new Rect(10, 24 + 150, 180, 30), "Online Docs"))
             {
                 Application.OpenURL("https://github.com/ilyshk4/luamod-wiki/wiki");
             }
 
-            if (GUI.Button(new Rect(10, 190, 180, 30), "Offline Docs", Libs.GUILib.buttonStyle))
+            if (GUI.Button(new Rect(10, 24 + 190, 180, 30), "Offline Docs"))
             {
                 ModIO.OpenFolderInFileBrowser("Doc");
             }
@@ -334,9 +310,6 @@ namespace LuaScripting
 
             if (!Machine.Active())
                 return;
-
-            if (hasErrors > 0)
-                hasErrors--;
 
             if (scriptOk && (Machine.Active().SimulationMachine != null))
             {

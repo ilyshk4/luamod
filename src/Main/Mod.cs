@@ -5,11 +5,14 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 using Modding.Blocks;
+using spaar.ModLoader.UI;
 
 namespace LuaScripting
 {
 	public class Mod : ModEntryPoint
 	{
+		public static GUISkin Skin;
+
 		public static List<string> defaultLuaFiles = new List<string>()
 		{
             {
@@ -27,7 +30,7 @@ namespace LuaScripting
 		public static MessageType netMsgSliderValue, netMsgEmulateKey, netMsgSetSteering;
 
 		public override void OnLoad()
-		{	
+		{
 			Libs.MachineLib.Init();
 			Libs.GUILib.Init();
 			Libs.InputLib.Init();

@@ -66,6 +66,17 @@
     <Compile Include="Mod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="UI\Buttons.cs" />
+    <Compile Include="UI\Colors.cs" />
+    <Compile Include="UI\Elements.cs" />
+    <Compile Include="UI\InputFields.cs" />
+    <Compile Include="UI\Labels.cs" />
+    <Compile Include="UI\Scrollview.cs" />
+    <Compile Include="UI\Settings.cs" />
+    <Compile Include="UI\Sliders.cs" />
+    <Compile Include="UI\Toggle.cs" />
+    <Compile Include="UI\Tools.cs" />
+    <Compile Include="UI\Windows.cs" />
     <Compile Include="UniLua\ByteString.cs" />
     <Compile Include="UniLua\Coder.cs" />
     <Compile Include="UniLua\Common.cs" />
