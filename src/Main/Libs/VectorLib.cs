@@ -31,6 +31,12 @@ namespace LuaScripting.Libs
                 new NameFuncPair("multiply", Multiply),
                 new NameFuncPair("equals", Equals), 
                 new NameFuncPair("look_rotation", LookRotation),
+                new NameFuncPair("angle", Angle),
+                new NameFuncPair("clamp_magnitude", ClampMagnitude),
+                new NameFuncPair("cross", Cross),
+                new NameFuncPair("project_on_plane", ProjectOnPlane),
+                new NameFuncPair("reflect", Reflect),
+                new NameFuncPair("quaternion_multiply", QuaternionMultiply),
             };
 
             lua.L_NewLib(define);
@@ -146,6 +152,42 @@ namespace LuaScripting.Libs
             return 1;
         }
 
+        private static int Angle(ILuaState lua)
+        {
+            lua.PushNumber(Vector3.Angle(CheckVector(lua, 1), CheckVector(lua, 2)));
+            return 1;
+        }
+        private static int ClampMagnitude(ILuaState lua)
+        {
+            PushVector(lua, Vector3.ClampMagnitude(CheckVector(lua, 1), (float) lua.L_CheckNumber(2)));
+            return 1;
+        }
+
+        private static int Cross(ILuaState lua)
+        {
+            PushVector(lua, Vector3.Cross(CheckVector(lua, 1), CheckVector(lua, 2)));
+            return 1;
+        }
+
+        private static int ProjectOnPlane(ILuaState lua)
+        {
+            PushVector(lua, Vector3.ProjectOnPlane(CheckVector(lua, 1), CheckVector(lua, 2)));
+            return 1;
+        }
+
+        private static int Reflect(ILuaState lua)
+        {
+            PushVector(lua, Vector3.Reflect(CheckVector(lua, 1), CheckVector(lua, 2)));
+            return 1;
+        }
+
+        private static int QuaternionMultiply(ILuaState lua)
+        {
+            PushVector(lua, Quaternion.Euler(CheckVector(lua, 2)) * (CheckVector(lua, 1)));
+            return 1;
+        }
+
+
         public static void PushVector(ILuaState lua, Vector4 vector)
         {
             lua.NewTable();
@@ -165,6 +207,8 @@ namespace LuaScripting.Libs
 
         public static Vector4 CheckVector(ILuaState lua, int index)
         {
+            lua.L_CheckType(index, LuaType.LUA_TTABLE);
+
             lua.GetField(index, "x");
             lua.GetField(index, "y");
             lua.GetField(index, "z");

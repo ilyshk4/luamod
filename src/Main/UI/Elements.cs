@@ -34,6 +34,8 @@ namespace spaar.ModLoader.UI
         {
             IsInitialized = true;
 
+            //GUI.skin.font = LuaScripting.LuaScripting.Instance.besiegeFont ?? GUI.skin.font;
+
             Colors = new Colors();
             Labels = new Labels();
             Windows = new Windows();

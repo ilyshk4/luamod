@@ -398,33 +398,40 @@ namespace LuaScripting.Libs
     {
         public Machine machine;
 
-        public BlockInfo[] blockInfos;
+        public Dictionary<int, BlockInfo> blockInfos = new Dictionary<int, BlockInfo>();
 
         private void Start()
         {
             machine = Machine.Active();
-            blockInfos = new BlockInfo[machine.SimulationBlocks.Count];
 
-            for (int i = 0; i < blockInfos.Length; i++)
-            {
-                blockInfos[i].lastPosition = machine.SimulationBlocks[i].transform.position;
-                blockInfos[i].lastRotation = machine.SimulationBlocks[i].transform.eulerAngles;
-            }
+            if (machine.SimulationMachine)
+                foreach (var block in machine.SimulationBlocks)
+                {
+                    BlockInfo info = new BlockInfo();
+                    info.lastPosition = block.transform.position;
+                    info.lastRotation = block.transform.eulerAngles;
+
+                    blockInfos.Add(block.BuildIndex, info);
+                }
         }
 
         private void FixedUpdate()
         {
-            for (int i = 0; i < blockInfos.Length; i++)
-            {
-                blockInfos[i].velocity = (machine.SimulationBlocks[i].transform.position - blockInfos[i].lastPosition) * 100;
-                blockInfos[i].angularVelocity = (machine.SimulationBlocks[i].transform.eulerAngles - blockInfos[i].lastRotation) * 100;
+            if (machine.SimulationMachine)
+                foreach (var block in machine.SimulationBlocks)
+                {
+                    if (blockInfos.ContainsKey(block.BuildIndex))
+                    {
+                        blockInfos[block.BuildIndex].velocity = (block.transform.position - blockInfos[block.BuildIndex].lastPosition) * 100;
+                        blockInfos[block.BuildIndex].angularVelocity = (block.transform.eulerAngles - blockInfos[block.BuildIndex].lastRotation) * 100;
 
-                blockInfos[i].lastPosition = machine.SimulationBlocks[i].transform.position;
-                blockInfos[i].lastRotation = machine.SimulationBlocks[i].transform.eulerAngles;
+                        blockInfos[block.BuildIndex].lastPosition = block.transform.position;
+                        blockInfos[block.BuildIndex].lastRotation = block.transform.eulerAngles;
+                    }
+                }
             }
-        }
 
-        public struct BlockInfo
+        public class BlockInfo
         {
             public Vector3 lastPosition, lastRotation, velocity, angularVelocity;
         }

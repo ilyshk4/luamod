@@ -25,6 +25,7 @@ namespace spaar.ModLoader.UI
 
             Default = new GUIStyle
             {
+                font = GUI.skin.font,
                 normal = { background = ModResource.GetTexture("blue-normal.png"), textColor = textColor },
                 hover = { background = ModResource.GetTexture("blue-light.png"), textColor = textColor },
                 active = { background = ModResource.GetTexture("blue-dark.png"), textColor = textColor },
@@ -38,12 +39,14 @@ namespace spaar.ModLoader.UI
 
             Red = new GUIStyle(Default)
             {
+                font = GUI.skin.font,
                 normal = { background = ModResource.GetTexture("button-light-grey.png"), },
                 hover = { background = ModResource.GetTexture("button-red.png"), },
             };
 
             Disabled = new GUIStyle(Default)
             {
+                font = GUI.skin.font,
                 normal = { background = ModResource.GetTexture("blue-very-dark.png") }
             };
 
@@ -51,6 +54,7 @@ namespace spaar.ModLoader.UI
             margin.left = 0;
             ComponentField = new GUIStyle(Default)
             {
+                font = GUI.skin.font,
                 margin = margin,
                 padding = Elements.Settings.LowPadding,
                 fontSize = 13
@@ -58,6 +62,7 @@ namespace spaar.ModLoader.UI
 
             LogEntryLabel = new GUIStyle(Elements.Labels.LogEntry)
             {
+                font = GUI.skin.font,
                 hover = { background = ModResource.GetTexture("blue-light.png"), textColor = textColor },
                 active = { background = ModResource.GetTexture("blue-dark.png"), textColor = Elements.Colors.LowlightText }
             };

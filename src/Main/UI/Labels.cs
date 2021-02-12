@@ -21,6 +21,7 @@ namespace spaar.ModLoader.UI
 
             LogEntry = new GUIStyle(Default)
             {
+                font = GUI.skin.font,
                 margin = { top = 2 },
                 alignment = TextAnchor.MiddleLeft,
                 richText = true
@@ -28,11 +29,13 @@ namespace spaar.ModLoader.UI
 
             Title = new GUIStyle(Default)
             {
+                font = GUI.skin.font,
                 fontStyle = FontStyle.Bold
             };
 
             LogEntryTitle = new GUIStyle(LogEntry)
             {
+                font = GUI.skin.font,
                 fontStyle = Title.fontStyle
             };
         }

@@ -29,6 +29,7 @@ namespace spaar.ModLoader.UI
 
             Alternate = new GUIStyle(Default)
             {
+                font = GUI.skin.font,
                 normal = { background = ModResource.GetTexture("blue-normal.png"), textColor = Elements.Colors.DefaultText }
             };
 
@@ -36,6 +37,7 @@ namespace spaar.ModLoader.UI
             margin.left = 0;
             ComponentField = new GUIStyle(Alternate)
             {
+                font = GUI.skin.font,
                 margin = margin,
                 padding = Elements.Settings.LowPadding,
                 fontSize = 13
@@ -43,6 +45,7 @@ namespace spaar.ModLoader.UI
 
             ThinNoTopBotMargin = new GUIStyle(Default)
             {
+                font = GUI.skin.font,
                 margin = Elements.Buttons.ThinNoTopBotMargin.margin,
                 padding = Elements.Buttons.ThinNoTopBotMargin.padding
             };

@@ -16,6 +16,7 @@ namespace spaar.ModLoader.UI
 
             Default = new GUIStyle
             {
+                font = GUI.skin.font,
                 normal = { background = ModResource.GetTexture("background-44px.png"), textColor = Elements.Colors.DefaultText },
                 fontSize = 16,
                 fontStyle = FontStyle.Bold,
@@ -26,6 +27,7 @@ namespace spaar.ModLoader.UI
 
             ClearDark = new GUIStyle
             {
+                font = GUI.skin.font,
                 normal = { background = ModResource.GetTexture("background-dark.png"), textColor = Elements.Colors.DefaultText },
                 border = new RectOffset(4, 4, 4, 4),
                 padding = Elements.Settings.DefaultPadding,

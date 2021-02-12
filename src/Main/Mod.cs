@@ -147,9 +147,15 @@ namespace LuaScripting
 
 		public static void LoadLuaRootFromMachine(bool useDefault = false)
 		{
-			if (ModIO.ExistsDirectory("LuaRoot"))
-				ModIO.DeleteDirectory("LuaRoot", true);
-			ModIO.CreateDirectory("LuaRoot");
+			try
+            {
+				if (ModIO.ExistsDirectory("LuaRoot"))
+					ModIO.DeleteDirectory("LuaRoot", true);
+				ModIO.CreateDirectory("LuaRoot");
+			} catch (Exception)
+            {
+				Debug.LogError("[LuaScripting] An error occured during removing LuaRoot. Close all open editors and install Notepad++ or other editor supporting overriding to avoid this error.");
+            }
 
 			if (!Machine.Active().MachineData.HasKey("lua"))
 				useDefault = true;

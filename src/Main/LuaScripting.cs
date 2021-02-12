@@ -33,6 +33,7 @@ namespace LuaScripting
         public Camera hudCamera;
         public Camera mainCamera;
 
+        public Font besiegeFont;
         public ChatView chatView;
         public Transform chatViewContent;
         private int lastChatMsgHashCode;
@@ -273,6 +274,7 @@ namespace LuaScripting
                 hudCamera = mainCamera.transform.GetChild(0).GetComponent<Camera>();
                 chatView = FindObjectOfType<ChatView>();
                 chatViewContent = chatView?.transform?.GetChild(0)?.GetChild(0)?.GetChild(0)?.GetChild(0)?.GetChild(0)?.GetChild(0);
+                besiegeFont = FindObjectOfType<DynamicText>().font;
             } catch (Exception)
             {
 

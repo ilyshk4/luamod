@@ -47,7 +47,8 @@ namespace LuaScripting.Libs
                 VectorLib.PushVector(lua, hit.point);
                 return 1;
             }
-            return 0;
+            VectorLib.PushVector(lua, Vector4.zero);
+            return 1;
         }
 
         public static int GetAxis(ILuaState lua)
