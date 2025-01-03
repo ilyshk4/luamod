@@ -35,6 +35,7 @@ namespace LuaScripting
 			Libs.GUILib.Init();
 			Libs.InputLib.Init();
 			Libs.LinesLib.Init();
+			Libs.EntitiesLib.Init();
 			LuaScripting.Init();
 			
 			netMsgSliderValue = ModNetworking.CreateMessageType(new DataType[]
@@ -114,15 +115,19 @@ namespace LuaScripting
                             {
 								SteeringWheel sw = block.InternalObject.SimBlock as SteeringWheel;
 								sw.AngleToBe = value;
-                            }
+                            } 
                         }
 					}
-
 				} catch (NullReferenceException)
                 {
 					// wellp, nothing to do here oof
                 }
 			};
+
+			ModConsole.RegisterCommand("kill_lua", (args) =>
+			{
+				UnityEngine.Object.Destroy(SingleInstance<LuaScripting>.Instance);
+			}, "kill...");
 
 			UnityEngine.Object.DontDestroyOnLoad(SingleInstance<LuaScripting>.Instance);
 		}
@@ -162,15 +167,13 @@ namespace LuaScripting
 			if (useDefault)
 				Debug.Log("[LuaScripting] Loaded machinne does not have LuaRoot in. Loading default.");
 
-
 			List<string> allFiles = useDefault ? defaultLuaFiles : Machine.Active().MachineData.ReadStringArray("lua_files").ToList();
 			List<string> allData = useDefault ? defaultLuaData : Machine.Active().MachineData.ReadStringArray("lua_data").ToList();
 
 			if (useDefault)
             {
 				allData[0] = $"-- Created {DateTime.Now} \n\n" + allData[0]; 
-            }
-
+            }	
 			for (int i = 0; i < allFiles.Count; i++)
             {
 				string file = allFiles[i];
@@ -178,9 +181,9 @@ namespace LuaScripting
 
 				string[] d = file.Split('/');
 				string[] c = new string[d.Length - 1];
-				for (int j = 0; j < d.Length - 1; j++)
-					c[i] = d[i];
 
+				for (int j = 0; j < d.Length - 1; j++)
+					c[j] = d[j];
 				string path = string.Join("/", c);
 
 				ModIO.CreateDirectory(path);

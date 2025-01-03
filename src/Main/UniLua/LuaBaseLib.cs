@@ -328,7 +328,7 @@ namespace UniLua
                             digit = Char.ToUpper(s[pos]) - 'A' + 10;
                         if (digit >= numBase)
                             break; // invalid numeral; force a fail
-                        n = n * (double) numBase + (double) digit;
+                        n = n * (double)numBase + (double)digit;
                         pos++;
                     } while (Char.IsLetterOrDigit(s, pos));
                     if (pos == s.Length - 1) // except guard, no invalid trailing characters?
@@ -424,7 +424,7 @@ namespace UniLua
                 sb.Append(s);
                 lua.Pop(1);
             }
-            ULDebug.Log(sb.ToString());
+            LuaScripting.LuaScripting.Instance.AddPrintLog(sb.ToString());
             return 0;
         }
 

@@ -27,7 +27,7 @@ namespace LuaScripting.Libs
                 }
 
             Events.OnMachineSimulationToggle += (pl, state) =>
-            { 
+            {
                 if (pl.Player == null || (pl.Player != null && pl.Player.IsLocalPlayer))
                 {
                     if (!state)
@@ -36,7 +36,7 @@ namespace LuaScripting.Libs
                     }
                 }
             };
-            
+
             define = new NameFuncPair[]
             {
                 new NameFuncPair("new_key_emulator", NewKeyEmulator),
@@ -74,7 +74,8 @@ namespace LuaScripting.Libs
                         }
                     }
                     return lua.ReturnError(1, $"there is no block with reference key {key}");
-                } else return lua.ReturnError(1, $"you can`t get block info by reference key from non local machine, use get_block_info(int build_index) instead.");
+                }
+                else return lua.ReturnError(1, $"you can`t get block info by reference key from non local machine, use get_block_info(int build_index) instead.");
             }
 
             if (lua.Type(1) == LuaType.LUA_TNUMBER)
@@ -91,10 +92,10 @@ namespace LuaScripting.Libs
 
             return 0;
         }
-        
+
         public static void PushMachineInfo(ILuaState lua, Machine machine)
         {
-            LuaMachineInfoCollector infoCollector = machine.SimulationMachine.GetComponent<LuaMachineInfoCollector>();
+            LuaPlayerMachine playerMachine = machine.SimulationMachine.GetComponent<LuaPlayerMachine>();
             lua.NewTable();
 
             lua.PushCSharpFunction((ll) =>
@@ -137,10 +138,10 @@ namespace LuaScripting.Libs
             lua.PushCSharpFunction(Utils.CF(() => machine.SimulationBlocks[0].transform.rotation * Vector3.forward));
             lua.SetField(-2, "rotation");
 
-            lua.PushCSharpFunction(Utils.CF(() => infoCollector.blockInfos[0].velocity));
+            lua.PushCSharpFunction(Utils.CF(() => playerMachine.blockInfos[0].velocity));
             lua.SetField(-2, "velocity");
 
-            lua.PushCSharpFunction(Utils.CF(() => infoCollector.blockInfos[0].angularVelocity));
+            lua.PushCSharpFunction(Utils.CF(() => playerMachine.blockInfos[0].angularVelocity));
             lua.SetField(-2, "angular_velocity");
 
             lua.PushCSharpFunction(Utils.CF(() => machine.Size));
@@ -155,7 +156,7 @@ namespace LuaScripting.Libs
             lua.PushCSharpFunction(Utils.CF(() => machine.IsDraggingBlocks));
             lua.SetField(-2, "is_dragging_blocks");
 
-            lua.PushCSharpFunction(Utils.CF(() => (int) machine.FirstBlock.Team));
+            lua.PushCSharpFunction(Utils.CF(() => (int)machine.FirstBlock.Team));
             lua.SetField(-2, "team");
 
             lua.PushCSharpFunction(Utils.CF(() => machine.SimulationMachine != null));
@@ -187,8 +188,8 @@ namespace LuaScripting.Libs
                     keyEmulators[keyCode] = true;
                 }
                 return 1;
-            }; 
-            
+            };
+
             CSharpFunctionDelegate stop = (state) =>
             {
                 if (keyEmulators[keyCode])
@@ -238,7 +239,7 @@ namespace LuaScripting.Libs
                 return lua.ReturnError(0, "there is no block with key: " + key);
             }
 
-            List<Block> blocks = LuaScripting.Instance.localMachineBlockRefs[key]; 
+            List<Block> blocks = LuaScripting.Instance.localMachineBlockRefs[key];
 
             CSharpFunctionDelegate setSliderValue = (state) =>
             {
@@ -246,7 +247,7 @@ namespace LuaScripting.Libs
                 foreach (Block b in blocks)
                 {
                     string uk = b.InternalObject.BuildIndex + mapperKey;
-                    float value = (float) lua.L_CheckNumber(2);
+                    float value = (float)lua.L_CheckNumber(2);
 
                     MapperType mapperType = b.InternalObject.SimBlock.GetMapperType("bmt-" + mapperKey);
                     if (mapperType == null)
@@ -271,7 +272,7 @@ namespace LuaScripting.Libs
 
             CSharpFunctionDelegate setSteering = (state) =>
             {
-                float angle = (float) lua.L_CheckNumber(1); 
+                float angle = (float)lua.L_CheckNumber(1);
 
                 foreach (Block b in blocks)
                 {
@@ -284,7 +285,8 @@ namespace LuaScripting.Libs
                             if (!steeringWheel.noRigidbody)
                             {
                                 steeringWheel.AngleToBe = angle;
-                            } else
+                            }
+                            else
                             {
                                 ModNetworking.SendToHost(Mod.netMsgSetSteering.CreateMessage(new object[]
                                 {
@@ -292,7 +294,8 @@ namespace LuaScripting.Libs
                                 }));
                             }
                         }
-                    } else
+                    }
+                    else
                     {
                         Debug.Log($"[LuaScripting] There is no steering wheel on {b}.");
                     }
@@ -312,7 +315,7 @@ namespace LuaScripting.Libs
 
         public static void PushBlockInfo(ILuaState lua, BlockBehaviour block)
         {
-            LuaMachineInfoCollector infoCollector = block.ParentMachine.SimulationMachine.GetComponent<LuaMachineInfoCollector>();
+            LuaPlayerMachine playerMachine = block.ParentMachine.SimulationMachine.GetComponent<LuaPlayerMachine>();
 
             lua.NewTable();
 
@@ -335,7 +338,7 @@ namespace LuaScripting.Libs
             lua.SetField(-2, "being_vacuumed");
 
             lua.PushCSharpFunction(Utils.CF(() => block.BlockID));
-            lua.SetField(-2, "id"); 
+            lua.SetField(-2, "id");
 
             lua.PushCSharpFunction(Utils.CF(() => block.BuildIndex));
             lua.SetField(-2, "build_index");
@@ -367,11 +370,11 @@ namespace LuaScripting.Libs
             lua.PushCSharpFunction(Utils.CF(() => block.Scale));
             lua.SetField(-2, "scale");
 
-            lua.PushCSharpFunction(Utils.CF(() => infoCollector.blockInfos[block.BuildIndex].velocity));
+            lua.PushCSharpFunction(Utils.CF(() => playerMachine.blockInfos[block.BuildIndex].velocity));
             lua.SetField(-2, "velocity");
 
-            lua.PushCSharpFunction(Utils.CF(() => infoCollector.blockInfos[block.BuildIndex].angularVelocity));
-            lua.SetField(-2, "angluar_velocity");
+            lua.PushCSharpFunction(Utils.CF(() => playerMachine.blockInfos[block.BuildIndex].angularVelocity));
+            lua.SetField(-2, "angular_velocity");
         }
 
         private static void Emulate(KeyCode key, bool emulate)
@@ -391,49 +394,6 @@ namespace LuaScripting.Libs
                         block, (int) key, emulate
                     }));
                 }
-        }
-    }
-
-    public class LuaMachineInfoCollector : MonoBehaviour
-    {
-        public Machine machine;
-
-        public Dictionary<int, BlockInfo> blockInfos = new Dictionary<int, BlockInfo>();
-
-        private void Start()
-        {
-            machine = Machine.Active();
-
-            if (machine.SimulationMachine)
-                foreach (var block in machine.SimulationBlocks)
-                {
-                    BlockInfo info = new BlockInfo();
-                    info.lastPosition = block.transform.position;
-                    info.lastRotation = block.transform.eulerAngles;
-
-                    blockInfos.Add(block.BuildIndex, info);
-                }
-        }
-
-        private void FixedUpdate()
-        {
-            if (machine.SimulationMachine)
-                foreach (var block in machine.SimulationBlocks)
-                {
-                    if (blockInfos.ContainsKey(block.BuildIndex))
-                    {
-                        blockInfos[block.BuildIndex].velocity = (block.transform.position - blockInfos[block.BuildIndex].lastPosition) * 100;
-                        blockInfos[block.BuildIndex].angularVelocity = (block.transform.eulerAngles - blockInfos[block.BuildIndex].lastRotation) * 100;
-
-                        blockInfos[block.BuildIndex].lastPosition = block.transform.position;
-                        blockInfos[block.BuildIndex].lastRotation = block.transform.eulerAngles;
-                    }
-                }
-            }
-
-        public class BlockInfo
-        {
-            public Vector3 lastPosition, lastRotation, velocity, angularVelocity;
         }
     }
 }

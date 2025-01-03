@@ -9,6 +9,15 @@ namespace LuaScripting
 {
     public static class Utils
     {
+        public static CSharpFunctionDelegate CF(Func<Quaternion> getQuat)
+        {
+            return (lua) =>
+            {
+                Libs.QuaternionLib.PushQuat(lua, getQuat());
+                return 1;
+            };
+        }
+
         public static CSharpFunctionDelegate CF(Func<bool> getBool)
         {
             return (lua) =>

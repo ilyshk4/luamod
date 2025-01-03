@@ -48,6 +48,27 @@ namespace UniLua
                 new NameFuncPair( "tanh",       Math_Tanh ),
                 new NameFuncPair( "tan",        Math_Tan ),
                 new NameFuncPair( "lerp",       Math_Lerp ),
+
+                new NameFuncPair( "inverse_lerp",       Math_InverseLerp),
+                new NameFuncPair( "lerp_unclamped",       Math_LerpUnclamped),
+                new NameFuncPair( "lerp_angle",       Math_LerpAngle),
+                new NameFuncPair( "clamp",       Math_Clamp ),
+                new NameFuncPair( "clamp01",       Math_Clamp01 ),
+                new NameFuncPair( "approximately",       Math_Approximately ),
+                new NameFuncPair( "round",       Math_Round),
+                new NameFuncPair( "closest_power_of_two",       Math_ClosestPowerOfTwo),
+                new NameFuncPair( "delta_angle",       Math_DeltaAngle),
+                new NameFuncPair( "gamma",       Math_Gamma),
+                new NameFuncPair( "gamma_to_linear_space",       Math_GammaToLinearSpace),
+                new NameFuncPair( "linear_to_gamma_space",       Math_LinearToGammaSpace),
+                new NameFuncPair( "move_towards",       Math_MoveTowards),
+                new NameFuncPair( "move_towards_angle",       Math_MoveTowardsAngle),
+                new NameFuncPair( "is_power_of_two",       Math_IsPowerOfTwo),
+                new NameFuncPair( "perlin_noise",       Math_PerlinNoise),
+                new NameFuncPair( "ping_pong",       Math_PingPong),
+                new NameFuncPair( "repeat",       Math_Repeat),
+                new NameFuncPair( "sign",       Math_Sign),
+                new NameFuncPair( "smoothstep",       Math_Smoothstep),
             };
 
             lua.L_NewLib(define);
@@ -60,6 +81,126 @@ namespace UniLua
 
             RandObj = new Random();
 
+            return 1;
+        }
+
+        private static int Math_Smoothstep(ILuaState state)
+        {
+            state.PushNumber(Mathf.SmoothStep((float)state.L_CheckNumber(1), (float)state.L_CheckNumber(2), (float)state.L_CheckNumber(3)));
+            return 1;
+        }
+
+        private static int Math_Sign(ILuaState state)
+        {
+            state.PushNumber(Mathf.Sign((float)state.L_CheckNumber(1)));
+            return 1;
+        }
+
+        private static int Math_Repeat(ILuaState state)
+        {
+            state.PushNumber(Mathf.Repeat((float)state.L_CheckNumber(1), (float)state.L_CheckNumber(2)));
+            return 1;
+        }
+
+        private static int Math_PingPong(ILuaState state)
+        {
+            state.PushNumber(Mathf.PingPong((float)state.L_CheckNumber(1), (float)state.L_CheckNumber(2)));
+            return 1;
+        }
+
+        private static int Math_PerlinNoise(ILuaState state)
+        {
+            state.PushNumber(Mathf.PerlinNoise((float)state.L_CheckNumber(1), (float)state.L_CheckNumber(2)));
+            return 1;
+        }
+
+        private static int Math_IsPowerOfTwo(ILuaState state)
+        {
+            state.PushBoolean(Mathf.IsPowerOfTwo((int)state.L_CheckNumber(1)));
+            return 1;
+        }
+
+        private static int Math_MoveTowardsAngle(ILuaState state)
+        {
+            state.PushNumber(Mathf.MoveTowardsAngle((float)state.L_CheckNumber(1), (float)state.L_CheckNumber(2), (float)state.L_CheckNumber(3)));
+            return 1;
+        }
+
+        private static int Math_MoveTowards(ILuaState state)
+        {
+            state.PushNumber(Mathf.MoveTowards((float)state.L_CheckNumber(1), (float)state.L_CheckNumber(2), (float)state.L_CheckNumber(3)));
+            return 1;
+        }
+
+        private static int Math_LinearToGammaSpace(ILuaState state)
+        {
+            state.PushNumber(Mathf.LinearToGammaSpace((float)state.L_CheckNumber(1)));
+            return 1;
+        }
+
+        private static int Math_GammaToLinearSpace(ILuaState state)
+        {
+            state.PushNumber(Mathf.GammaToLinearSpace((float)state.L_CheckNumber(1)));
+            return 1;
+        }
+
+        private static int Math_Gamma(ILuaState state)
+        {
+            state.PushNumber(Mathf.Gamma((float)state.L_CheckNumber(1), (float)state.L_CheckNumber(2), (float)state.L_CheckNumber(3)));
+            return 1;
+        }
+
+        private static int Math_DeltaAngle(ILuaState state)
+        {
+            state.PushNumber(Mathf.DeltaAngle((float)state.L_CheckNumber(1), (float)state.L_CheckNumber(2)));
+            return 1;
+        }
+
+        private static int Math_ClosestPowerOfTwo(ILuaState state)
+        {
+            state.PushNumber(Mathf.ClosestPowerOfTwo((int)state.L_CheckNumber(1)));
+            return 1;
+        }
+
+        private static int Math_Round(ILuaState state)
+        {
+            state.PushNumber(Mathf.Round((float)state.L_CheckNumber(1)));
+            return 1;
+        }
+
+        private static int Math_Approximately(ILuaState state)
+        {
+            state.PushBoolean(Mathf.Approximately((float)state.L_CheckNumber(1), (float)state.L_CheckNumber(2)));
+            return 1;
+        }
+
+        private static int Math_Clamp01(ILuaState state)
+        {
+            state.PushNumber(Mathf.Clamp01((float)state.L_CheckNumber(1)));
+            return 1;
+        }
+
+        private static int Math_Clamp(ILuaState state)
+        {
+            state.PushNumber(Mathf.Clamp((float)state.L_CheckNumber(1), (float)state.L_CheckNumber(2), (float)state.L_CheckNumber(3)));
+            return 1;
+        }
+
+        private static int Math_LerpAngle(ILuaState state)
+        {
+            state.PushNumber(Mathf.LerpAngle((float)state.L_CheckNumber(1), (float)state.L_CheckNumber(2), (float)state.L_CheckNumber(3)));
+            return 1;
+        }
+
+        private static int Math_LerpUnclamped(ILuaState state)
+        {
+            state.PushNumber(Mathf.LerpUnclamped((float)state.L_CheckNumber(1), (float)state.L_CheckNumber(2), (float)state.L_CheckNumber(3)));
+            return 1;
+        }
+
+        private static int Math_InverseLerp(ILuaState state)
+        {
+            state.PushNumber(Mathf.InverseLerp((float)state.L_CheckNumber(1), (float)state.L_CheckNumber(2), (float)state.L_CheckNumber(3)));
             return 1;
         }
 

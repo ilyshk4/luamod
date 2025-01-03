@@ -24,7 +24,7 @@ namespace UniLua
                 var buf = node.Value;
                 for (var j = 0; j < buf.Length; ++j)
                 {
-                    result[i++] = (char) buf[j];
+                    result[i++] = (char)buf[j];
                 }
                 node = node.Next;
             }

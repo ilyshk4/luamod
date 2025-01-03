@@ -79,7 +79,7 @@ namespace UniLua
                 return lua.L_Error("string slice too long");
             lua.L_CheckStack(n, "string slice too long");
             for (int i = 0; i < n; ++i)
-                lua.PushInteger((byte) s[(int) posi + i - 1]);
+                lua.PushInteger((byte)s[(int)posi + i - 1]);
             return n;
         }
 
@@ -90,8 +90,8 @@ namespace UniLua
             for (int i = 1; i <= n; ++i)
             {
                 int c = lua.L_CheckInteger(i);
-                lua.L_ArgCheck((char) c == c, i, "value out of range");
-                sb.Append((char) c);
+                lua.L_ArgCheck((char)c == c, i, "value out of range");
+                sb.Append((char)c);
             }
             lua.PushString(sb.ToString());
             return 1;
@@ -348,7 +348,7 @@ namespace UniLua
         private static int CheckCapture(MatchState ms, char l)
         {
             var lua = ms.Lua;
-            int i = (int) (l - '1');
+            int i = (int)(l - '1');
             if (i < 0 || i >= ms.Level || ms.Capture[i].Len == CAP_UNFINISHED)
                 return lua.L_Error("invalid capture index %d", i + 1);
             return i;
@@ -627,7 +627,7 @@ namespace UniLua
                 {
                     case 'c':
                         {
-                            sb.Append((char) lua.L_CheckInteger(arg));
+                            sb.Append((char)lua.L_CheckInteger(arg));
                             break;
                         }
                     case 'd':
@@ -727,11 +727,11 @@ namespace UniLua
                 {
                     if (i + 1 >= s.Length || !Char.IsDigit(s[i + 1]))
                     {
-                        sb.AppendFormat("\\{0:D}", (int) c);
+                        sb.AppendFormat("\\{0:D}", (int)c);
                     }
                     else
                     {
-                        sb.AppendFormat("\\{0:D3}", (int) c);
+                        sb.AppendFormat("\\{0:D3}", (int)c);
                     }
                 }
                 else

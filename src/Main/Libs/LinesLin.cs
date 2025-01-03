@@ -32,9 +32,10 @@ namespace LuaScripting.Libs
         private static int NewLineRenderer(ILuaState lua)
         {
             GameObject luaLineRenderer = new GameObject("Lua Line Renderer");
-            LuaLineRenderer llr = luaLineRenderer.AddComponent<LuaLineRenderer>();
-            llr.lineRenderer.material = lineMaterial;
-            llr.lineRenderer.SetWidth(0.5F, 0.5F);
+            luaLineRenderer.AddComponent<LuaSimulationTimeObject>();
+            LineRenderer lr = luaLineRenderer.AddComponent<LineRenderer>();
+            lr.material = lineMaterial;
+            lr.SetWidth(0.5F, 0.5F);
 
             CSharpFunctionDelegate setPoints = (state) =>
             {
@@ -43,23 +44,23 @@ namespace LuaScripting.Libs
                 for (int i = 1; i <= state.GetTop(); i++)
                     points.Add(VectorLib.CheckVector(lua, i));
 
-                llr.lineRenderer.SetPositions(points.ToArray());
-                return 1;
+                lr.SetPositions(points.ToArray());
+                return 0;
             };
 
             CSharpFunctionDelegate setWidth = (state) =>
             {
                 float start = (float) state.L_CheckNumber(1);
                 float end = (float) state.L_CheckNumber(2);
-                llr.lineRenderer.SetWidth(start, end);
-                return 1;
+                lr.SetWidth(start, end);
+                return 0;
             };
 
             CSharpFunctionDelegate setColor = (state) =>
             {
                 Vector4 start = VectorLib.CheckVector(state, 1);
-                llr.lineRenderer.material.color = start;
-                return 1;
+                lr.material.color = start;
+                return 0;
             };
 
             lua.NewTable(); //2, 1);
@@ -76,15 +77,8 @@ namespace LuaScripting.Libs
         }
     }
 
-    public class LuaLineRenderer : MonoBehaviour
+    public class LuaSimulationTimeObject : MonoBehaviour
     {
-        public LineRenderer lineRenderer;
-
-        private void Awake()
-        {
-            lineRenderer = gameObject.AddComponent<LineRenderer>();
-        }
-
         private void FixedUpdate()
         {
             if (Machine.Active().SimulationMachine == null)

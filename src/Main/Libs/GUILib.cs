@@ -46,8 +46,12 @@ namespace LuaScripting.Libs
                 new NameFuncPair("VerticalSlider", VerticalSlider),
                 new NameFuncPair("Window", Window),
                 new NameFuncPair("WorldToScreenPoint", WorldToScreenPoint),
+                new NameFuncPair("DrawTexture", DrawTexture),
+                new NameFuncPair("RotateAroundPoint", RotateAroundPoint),
+                new NameFuncPair("ScaleAroundPoint", ScaleAroundPoint),
             };
 
+            // this is the only place i use this function because i was too lazy to rename it all
             define = Utils.MakePretty(define);
         }
 
@@ -56,6 +60,18 @@ namespace LuaScripting.Libs
             lua.L_NewLib(define);
 
             return 1;
+        }
+
+        private static int ScaleAroundPoint(ILuaState state)
+        {
+            GUIUtility.ScaleAroundPivot(VectorLib.CheckVector(state, 1), VectorLib.CheckVector(state, 2));
+            return 0;
+        }
+
+        private static int RotateAroundPoint(ILuaState state)
+        {
+            GUIUtility.RotateAroundPivot((float)state.L_CheckNumber(1), VectorLib.CheckVector(state, 2));
+            return 0;
         }
 
         public static int Label(ILuaState lua)
@@ -70,6 +86,14 @@ namespace LuaScripting.Libs
             pos.y = Screen.height - pos.y;
             VectorLib.PushVector(lua, pos);
             return 1;
+        }
+
+        public static int DrawTexture(ILuaState lua)
+        {
+            Rect position = RectLib.CheckRect(lua, 1);
+            Texture2D texture = LuaScripting.Instance.loadedTextures[lua.L_CheckInteger(2)];
+            GUI.DrawTexture(position, texture);
+            return 0;
         }
 
         public static int Toggle(ILuaState lua)

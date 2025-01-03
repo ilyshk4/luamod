@@ -1,8 +1,8 @@
 <Mod>
 	<Name>Lua Scripting Mod</Name>
 	<Author>ilyshk4</Author>
-	<Version>1.1.4</Version>
-	<Description>A pretty powerful tool to create advanced machines using Lua scripts with multiplayer support.</Description>
+	<Version>1.1.9</Version>
+	<Description>Powerful tool to create machines using Lua scripts.</Description>
 	<Icon name="icon" />
 	<WorkshopThumbnail name="icon" />
 	<MultiplayerCompatible>true</MultiplayerCompatible>

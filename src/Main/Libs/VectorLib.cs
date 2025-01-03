@@ -30,13 +30,12 @@ namespace LuaScripting.Libs
                 new NameFuncPair("negative", Negative),
                 new NameFuncPair("multiply", Multiply),
                 new NameFuncPair("equals", Equals), 
-                new NameFuncPair("look_rotation", LookRotation),
                 new NameFuncPair("angle", Angle),
                 new NameFuncPair("clamp_magnitude", ClampMagnitude),
                 new NameFuncPair("cross", Cross),
                 new NameFuncPair("project_on_plane", ProjectOnPlane),
                 new NameFuncPair("reflect", Reflect),
-                new NameFuncPair("quaternion_multiply", QuaternionMultiply),
+                new NameFuncPair("look_rotation", LookRotation),
             };
 
             lua.L_NewLib(define);
@@ -146,17 +145,12 @@ namespace LuaScripting.Libs
             return 1;
         }
 
-        private static int LookRotation(ILuaState lua)
-        {
-            PushVector(lua, Quaternion.LookRotation(CheckVector(lua, 1)).eulerAngles);
-            return 1;
-        }
-
         private static int Angle(ILuaState lua)
         {
             lua.PushNumber(Vector3.Angle(CheckVector(lua, 1), CheckVector(lua, 2)));
             return 1;
         }
+
         private static int ClampMagnitude(ILuaState lua)
         {
             PushVector(lua, Vector3.ClampMagnitude(CheckVector(lua, 1), (float) lua.L_CheckNumber(2)));
@@ -180,13 +174,12 @@ namespace LuaScripting.Libs
             PushVector(lua, Vector3.Reflect(CheckVector(lua, 1), CheckVector(lua, 2)));
             return 1;
         }
-
-        private static int QuaternionMultiply(ILuaState lua)
+        
+        private static int LookRotation(ILuaState lua)
         {
-            PushVector(lua, Quaternion.Euler(CheckVector(lua, 2)) * (CheckVector(lua, 1)));
+            PushVector(lua, Quaternion.LookRotation(CheckVector(lua, 1), CheckVector(lua, 2)).eulerAngles);
             return 1;
         }
-
 
         public static void PushVector(ILuaState lua, Vector4 vector)
         {

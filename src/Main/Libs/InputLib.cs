@@ -16,7 +16,8 @@ namespace LuaScripting.Libs
             define = new NameFuncPair[]
             {
                 new NameFuncPair("mouse_screen_position", Utils.CF(() => Input.mousePosition)),
-                new NameFuncPair("mouse_raycast_hit_point", MouseRaycasyHitPoint),
+                new NameFuncPair("mouse_raycast_hit_point", MouseRaycastHitPoint),
+                new NameFuncPair("mouse_raycast_hit", MouseRaycastHit),
                 new NameFuncPair("get_axis", GetAxis),
                 new NameFuncPair("get_axis_raw", GetAxisRaw),
                 new NameFuncPair("get_key", GetKey),
@@ -27,6 +28,9 @@ namespace LuaScripting.Libs
                 new NameFuncPair("get_mouse_button_up", GetMouseButtonUp),
                 new NameFuncPair("any_key", Utils.CF(() => Input.anyKey)),
                 new NameFuncPair("any_key_down", Utils.CF(() => Input.anyKeyDown)),
+
+                new NameFuncPair("mouse_scroll_delta", Utils.CF(() => Input.mouseScrollDelta)),
+                new NameFuncPair("main_camera_position", Utils.CF(() => LuaScripting.Instance.mainCamera.transform.position)),
             };
         }
 
@@ -37,7 +41,46 @@ namespace LuaScripting.Libs
             return 1;
         }
 
-        public static int MouseRaycasyHitPoint(ILuaState lua)
+        public static int MouseRaycastHit(ILuaState lua)
+        {
+            RaycastHit hit;
+            Ray ray = LuaScripting.Instance.mainCamera.ScreenPointToRay(Input.mousePosition);
+
+            if (Physics.Raycast(ray, out hit))
+            {
+                lua.NewTable();
+
+                BlockBehaviour hitBlock = hit.transform.GetComponent<BlockBehaviour>();
+
+                lua.PushNumber(hit.distance);
+                lua.SetField(-2, "distance");
+
+                VectorLib.PushVector(lua, hit.point);
+                lua.SetField(-2, "point");
+
+                VectorLib.PushVector(lua, hit.normal);
+                lua.SetField(-2, "normal");
+
+                lua.PushBoolean(hitBlock != null);
+                lua.SetField(-2, "is_block");
+
+                lua.PushCSharpFunction((l) =>
+                {
+                    if (hitBlock != null)
+                        MachineLib.PushBlockInfo(lua, hitBlock);
+                    else
+                        return 0;
+                    return 1;
+                });
+                lua.SetField(-2, "get_block_info");
+
+                return 1;
+            }
+            VectorLib.PushVector(lua, Vector4.zero);
+            return 1;
+        }
+
+        public static int MouseRaycastHitPoint(ILuaState lua)
         {
             RaycastHit hit;
             Ray ray = LuaScripting.Instance.mainCamera.ScreenPointToRay(Input.mousePosition);

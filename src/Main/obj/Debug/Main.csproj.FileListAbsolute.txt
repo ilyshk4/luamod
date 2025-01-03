@@ -53,8 +53,8 @@ F:\Par\steamapps\common\Besiege\Besiege_Data\Mods\LuaScripting Project\src\Main\
 F:\Par\steamapps\common\Besiege\Besiege_Data\Mods\LuaScripting Project\src\Main\bin\Debug\UnityEngine.Networking.dll
 F:\Par\steamapps\common\Besiege\Besiege_Data\Mods\LuaScripting Project\src\Main\bin\Debug\ch.sycoforge.Decal.dll
 F:\Par\steamapps\common\Besiege\Besiege_Data\Mods\LuaScripting Project\src\Main\bin\Debug\NATTraversalForUNET.dll
-F:\Par\steamapps\common\Besiege\Besiege_Data\Mods\LuaScripting Project\src\Main\obj\Debug\Main.csprojAssemblyReference.cache
 F:\Par\steamapps\common\Besiege\Besiege_Data\Mods\LuaScripting Project\src\Main\obj\Debug\Main.csproj.CoreCompileInputs.cache
 F:\Par\steamapps\common\Besiege\Besiege_Data\Mods\LuaScripting Project\src\Main\obj\Debug\Main.csproj.CopyComplete
 F:\Par\steamapps\common\Besiege\Besiege_Data\Mods\LuaScripting Project\src\Main\obj\Debug\Main.dll
 F:\Par\steamapps\common\Besiege\Besiege_Data\Mods\LuaScripting Project\src\Main\obj\Debug\Main.pdb
+F:\Par\steamapps\common\Besiege\Besiege_Data\Mods\LuaScripting Project\src\Main\obj\Debug\Main.csproj.AssemblyReference.cache

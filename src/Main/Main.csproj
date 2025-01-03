@@ -51,6 +51,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Libs\ChatLib.cs" />
+    <Compile Include="Libs\ShapesLib.cs" />
+    <Compile Include="Libs\EntitiesLib.cs" />
+    <Compile Include="Libs\GameLib.cs" />
+    <Compile Include="Libs\TextureLib.cs" />
+    <Compile Include="Libs\QuaternionLib.cs" />
     <Compile Include="Libs\TTSLib.cs" />
     <Compile Include="Libs\ScreenLib.cs" />
     <Compile Include="Libs\PlayersLib.cs" />
@@ -62,6 +67,7 @@
     <Compile Include="Libs\CursorLib.cs" />
     <Compile Include="Libs\VectorLib.cs" />
     <Compile Include="Libs\RectLib.cs" />
+    <Compile Include="LuaPlayerMachine.cs" />
     <Compile Include="LuaScripting.cs" />
     <Compile Include="Mod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

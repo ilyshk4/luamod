@@ -330,7 +330,7 @@ namespace UniLua
 
         private static void F_Call(ref CallS ud)
         {
-            CallS c = (CallS) ud;
+            CallS c = (CallS)ud;
             c.L.D_Call(c.L.Stack[c.FuncIndex], c.NumResults, false);
         }
         private static PFuncDelegate<CallS> DG_F_Call = F_Call;
@@ -717,7 +717,7 @@ namespace UniLua
         void ILuaAPI.XMove(ILuaState to, int n)
         {
             var toLua = to as LuaState;
-            if ((LuaState) this == toLua)
+            if ((LuaState)this == toLua)
                 return;
 
             Utl.ApiCheckNumElems(this, n);
@@ -1031,7 +1031,7 @@ namespace UniLua
             if (!Index2Addr(index, out addr))
                 return LuaType.LUA_TNONE;
 
-            return (LuaType) addr.V.Tt;
+            return (LuaType)addr.V.Tt;
         }
 
         internal static string TypeName(LuaType t)
@@ -1086,7 +1086,7 @@ namespace UniLua
 
         internal string ObjTypeName(ref TValue v)
         {
-            return TypeName((LuaType) v.Tt);
+            return TypeName((LuaType)v.Tt);
         }
 
         // 用于内部使用 不会因为 ApiIncrTop() 检查 Top 超过 CI.Top 报错
@@ -1169,16 +1169,16 @@ namespace UniLua
 
             switch (addr.V.Tt)
             {
-                case (int) LuaType.LUA_TSTRING:
+                case (int)LuaType.LUA_TSTRING:
                     {
                         var s = addr.V.SValue();
                         return s == null ? 0 : s.Length;
                     }
-                case (int) LuaType.LUA_TUSERDATA:
+                case (int)LuaType.LUA_TUSERDATA:
                     {
                         return addr.V.RawUValue().Length;
                     }
-                case (int) LuaType.LUA_TTABLE:
+                case (int)LuaType.LUA_TTABLE:
                     {
                         return addr.V.HValue().Length;
                     }
@@ -1217,13 +1217,13 @@ namespace UniLua
 
         void ILuaAPI.PushInteger(int n)
         {
-            Top.V.SetNValue((double) n);
+            Top.V.SetNValue((double)n);
             ApiIncrTop();
         }
 
         void ILuaAPI.PushUnsigned(uint n)
         {
-            Top.V.SetNValue((double) n);
+            Top.V.SetNValue((double)n);
             ApiIncrTop();
         }
 
@@ -1301,7 +1301,7 @@ namespace UniLua
         {
             Top.V.SetThValue(this);
             ApiIncrTop();
-            return G.MainThread == (LuaState) this;
+            return G.MainThread == (LuaState)this;
         }
 
         void ILuaAPI.Pop(int n)
@@ -1318,13 +1318,13 @@ namespace UniLua
             LuaTable mt;
             switch (addr.V.Tt)
             {
-                case (int) LuaType.LUA_TTABLE:
+                case (int)LuaType.LUA_TTABLE:
                     {
                         var tbl = addr.V.HValue();
                         mt = tbl.MetaTable;
                         break;
                     }
-                case (int) LuaType.LUA_TUSERDATA:
+                case (int)LuaType.LUA_TUSERDATA:
                     {
                         var ud = addr.V.RawUValue();
                         mt = ud.MetaTable;
@@ -1366,13 +1366,13 @@ namespace UniLua
 
             switch (addr.V.Tt)
             {
-                case (int) LuaType.LUA_TTABLE:
+                case (int)LuaType.LUA_TTABLE:
                     {
                         var tbl = addr.V.HValue();
                         tbl.MetaTable = mt;
                         break;
                     }
-                case (int) LuaType.LUA_TUSERDATA:
+                case (int)LuaType.LUA_TUSERDATA:
                     {
                         var ud = addr.V.RawUValue();
                         ud.MetaTable = mt;
@@ -1473,7 +1473,7 @@ namespace UniLua
             if (addr.V.TtIsNumber())
             {
                 isnum = true;
-                return (int) addr.V.NValue;
+                return (int)addr.V.NValue;
             }
 
             if (addr.V.TtIsString())
@@ -1482,7 +1482,7 @@ namespace UniLua
                 if (V_ToNumber(addr, ref n))
                 {
                     isnum = true;
-                    return (int) n.NValue;
+                    return (int)n.NValue;
                 }
             }
 
@@ -1508,7 +1508,7 @@ namespace UniLua
             if (addr.V.TtIsNumber())
             {
                 isnum = true;
-                return (uint) addr.V.NValue;
+                return (uint)addr.V.NValue;
             }
 
             if (addr.V.TtIsString())
@@ -1517,7 +1517,7 @@ namespace UniLua
                 if (V_ToNumber(addr, ref n))
                 {
                     isnum = true;
-                    return (uint) n.NValue;
+                    return (uint)n.NValue;
                 }
             }
 
@@ -1582,10 +1582,10 @@ namespace UniLua
 
             switch (addr.V.Tt)
             {
-                case (int) LuaType.LUA_TUSERDATA:
+                case (int)LuaType.LUA_TUSERDATA:
                     throw new System.NotImplementedException();
-                case (int) LuaType.LUA_TLIGHTUSERDATA: { return addr.V.OValue; }
-                case (int) LuaType.LUA_TUINT64: { return addr.V.UInt64Value; }
+                case (int)LuaType.LUA_TLIGHTUSERDATA: { return addr.V.OValue; }
+                case (int)LuaType.LUA_TUINT64: { return addr.V.UInt64Value; }
                 default: return null;
             }
         }

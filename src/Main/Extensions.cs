@@ -43,6 +43,7 @@ namespace LuaScripting
             return arr;
         }
 
+        // 2hard4me2understandStack
         public static Vector4[] CheckVectorArray(this ILuaState lua, int index)
         {
             lua.L_CheckType(index, LuaType.LUA_TTABLE);

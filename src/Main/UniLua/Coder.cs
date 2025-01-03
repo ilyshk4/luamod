@@ -126,7 +126,7 @@ namespace UniLua
 
         public static int INDEXK(int r)
         {
-            return ((int) r & ~BITRK);
+            return ((int)r & ~BITRK);
         }
 
         public static int MYK(int x)
@@ -136,7 +136,7 @@ namespace UniLua
 
         public static uint MASK1(int size, int pos)
         {
-            return ((~((~((uint) 0)) << size)) << pos);
+            return ((~((~((uint)0)) << size)) << pos);
         }
 
         public static uint MASK0(int size, int pos)
@@ -146,25 +146,25 @@ namespace UniLua
 
         public OpCode GET_OPCODE()
         {
-            return (OpCode) ((Value >> POS_OP) & MASK1(SIZE_OP, 0));
+            return (OpCode)((Value >> POS_OP) & MASK1(SIZE_OP, 0));
         }
 
         public Instruction SET_OPCODE(OpCode op)
         {
             Value = (Value & MASK0(SIZE_OP, POS_OP)) |
-                ((((uint) op) << POS_OP) & MASK1(SIZE_OP, POS_OP));
+                ((((uint)op) << POS_OP) & MASK1(SIZE_OP, POS_OP));
             return this;
         }
 
         public int GETARG(int pos, int size)
         {
-            return (int) ((Value >> pos) & MASK1(size, 0));
+            return (int)((Value >> pos) & MASK1(size, 0));
         }
 
         public Instruction SETARG(int value, int pos, int size)
         {
             Value = ((Value & MASK0(size, pos)) |
-                (((uint) value << pos) & MASK1(size, pos)));
+                (((uint)value << pos) & MASK1(size, pos)));
             return this;
         }
 
@@ -206,23 +206,23 @@ namespace UniLua
 
         public static Instruction CreateABC(OpCode op, int a, int b, int c)
         {
-            return (Instruction) ((((uint) op) << POS_OP)
-                | ((uint) a << POS_A)
-                | ((uint) b << POS_B)
-                | ((uint) c << POS_C));
+            return (Instruction)((((uint)op) << POS_OP)
+                | ((uint)a << POS_A)
+                | ((uint)b << POS_B)
+                | ((uint)c << POS_C));
         }
 
         public static Instruction CreateABx(OpCode op, int a, uint bc)
         {
-            return (Instruction) ((((uint) op) << POS_OP)
-                | ((uint) a << POS_A)
-                | ((uint) bc << POS_Bx));
+            return (Instruction)((((uint)op) << POS_OP)
+                | ((uint)a << POS_A)
+                | ((uint)bc << POS_Bx));
         }
 
         public static Instruction CreateAx(OpCode op, int a)
         {
-            return (Instruction) ((((uint) op) << POS_OP)
-                | ((uint) a << POS_Ax));
+            return (Instruction)((((uint)op) << POS_OP)
+                | ((uint)a << POS_Ax));
         }
     }
 
@@ -963,7 +963,7 @@ namespace UniLua
                 {
                     fs.Lexer.SyntaxError("function or expression too complex");
                 }
-                fs.Proto.MaxStackSize = (byte) newStack;
+                fs.Proto.MaxStackSize = (byte)newStack;
             }
         }
 
@@ -1277,7 +1277,7 @@ namespace UniLua
         public static int CodeK(FuncState fs, int reg, int k)
         {
             if (k <= Instruction.MAXARG_Bx)
-                return CodeABx(fs, OpCode.OP_LOADK, reg, (uint) k);
+                return CodeABx(fs, OpCode.OP_LOADK, reg, (uint)k);
             else
             {
                 int p = CodeABx(fs, OpCode.OP_LOADKX, reg, 0);
@@ -1288,7 +1288,7 @@ namespace UniLua
 
         public static int CodeAsBx(FuncState fs, OpCode op, int a, int sBx)
         {
-            return CodeABx(fs, op, a, ((uint) sBx) + Instruction.MAXARG_sBx);
+            return CodeABx(fs, op, a, ((uint)sBx) + Instruction.MAXARG_sBx);
         }
 
         public static int CodeABx(FuncState fs, OpCode op, int a, uint bc)

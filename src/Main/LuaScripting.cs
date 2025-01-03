@@ -22,14 +22,22 @@ namespace LuaScripting
         private ThreadStatus _status;
 
         private Rect windowRect = new Rect(6, 70, 200, 254);
+        private Rect consoleWindowRect = new Rect(274, 70, 500, 600);
+        private Vector2 consoleWindowScrollPos = Vector2.zero;
 
         private int startRef, updateRef, lateUpdate, fixedUpdateRef, onguiRef;
         private bool scriptOk;
         private static bool markForLoadFromMachine = true;
 
         public List<AwaitAction> awaitActions = new List<AwaitAction>();
+
         public Dictionary<string, List<Block>> localMachineBlockRefs = new Dictionary<string, List<Block>>();
         public Dictionary<KeyCode, List<Block>> localMachineUsedKeys = new Dictionary<KeyCode, List<Block>>();
+
+        public List<Texture2D> loadedTextures = new List<Texture2D>();
+
+        public Queue<string> printLog = new Queue<string>();
+
         public Camera hudCamera;
         public Camera mainCamera;
 
@@ -37,7 +45,7 @@ namespace LuaScripting
         public ChatView chatView;
         public Transform chatViewContent;
         private int lastChatMsgHashCode;
-        
+
         public static void AddAwaitAction(Action action, int time)
         {
             Instance.awaitActions.Add(new AwaitAction()
@@ -60,6 +68,7 @@ namespace LuaScripting
                 {
                     if (!state)
                     {
+                        Instance.loadedTextures.Clear();
                         Instance.awaitActions.Clear();
                         Instance.localMachineBlockRefs.Clear();
                         Instance.localMachineUsedKeys.Clear();
@@ -67,6 +76,9 @@ namespace LuaScripting
 
                         Cursor.visible = true;
                         Cursor.lockState = CursorLockMode.None;
+                    } else
+                    {
+                        Instance.printLog.Clear();
                     }
                 }
             };
@@ -76,28 +88,21 @@ namespace LuaScripting
                 Machine.Active().MachineData.Clear();
             };
 
-            Events.OnBlockInit += (block) =>
-            {
-                OnBlockInit(block);
-            };
+            Events.OnBlockInit += OnBlockInit;
 
             UnityEngine.SceneManagement.SceneManager.sceneLoaded += (a, b) =>
             {
                 Instance.Start();
             };
         }
-        //if (!targetAngleModeWarning)
-        //{
-        //    targetAngleModeWarning = true;
-        //    Debug.Log("[LuaScripting] Note that since you set the hinge angle programmatically, you will no longer be able to set the angle by input. Also, since target angle mode on this hinge is disabled besiege for some reason will start spam \"targetAngleMode??\" in console every tick causing huge lags. So, for now print, log and warning messages are disabled.");
-        //}
-        //
-        //Debug.logger.filterLogType = LogType.Error;
 
         private static void OnBlockInit(Block block)
         {
             if (block.InternalObject.BuildIndex == 0)
             {
+                if (block.Machine.SimulationMachine)
+                    block.Machine.SimulationMachine.gameObject.AddComponent<LuaPlayerMachine>().machine = block.InternalObject.ParentMachine;
+
                 if (block.InternalObject.ParentMachine == Machine.Active())
                 {
                     if (!Machine.Active().SimulationMachine)
@@ -106,8 +111,6 @@ namespace LuaScripting
                     }
                     else
                     {
-                        Machine.Active().SimulationMachine.gameObject.AddComponent<Libs.LuaMachineInfoCollector>();
-
                         foreach (Block b in block.Machine.BuildingBlocks)
                         {
                             MText refKey = b.InternalObject.GetMapperType("bmt-lua_ref_key") as MText;
@@ -115,7 +118,7 @@ namespace LuaScripting
                             if (refKey != null)
                             {
                                 if (!Instance.localMachineBlockRefs.ContainsKey(refKey.Value))
-                                    Instance.localMachineBlockRefs.Add(refKey.Value, new List<Block>()); ;
+                                    Instance.localMachineBlockRefs.Add(refKey.Value, new List<Block>());
                                 Instance.localMachineBlockRefs[refKey.Value].Add(b);
                             }
 
@@ -139,7 +142,9 @@ namespace LuaScripting
             } else
             {
                 string coolBlockRefKey = (block.Prefab.Name + "_" + block.Guid.ToString().Substring(0, 8)).Replace(' ', '_');
+
                 block.InternalObject.AddText(new MText("Ref. Key", "lua_ref_key", coolBlockRefKey));
+
                 block.InternalObject.Prefab.EmulatesAnyKeys = true;
             }
         }
@@ -161,12 +166,18 @@ namespace LuaScripting
             _lua.L_RequireF("players", Libs.PlayersLib.OpenLib, true);
             _lua.L_RequireF("screen", Libs.ScreenLib.OpenLib, true);
             _lua.L_RequireF("chat", Libs.ChatLib.OpenLib, true);
+            _lua.L_RequireF("quaternion", Libs.QuaternionLib.OpenLib, true);
+            _lua.L_RequireF("texture", Libs.TextureLib.OpenLib, true);
+            _lua.L_RequireF("game", Libs.GameLib.OpenLib, true);
+            _lua.L_RequireF("shapes", Libs.ShapesLib.OpenLib, true);
+            _lua.L_RequireF("entities", Libs.EntitiesLib.OpenLib, true);
 
             _status = _lua.L_DoFile("main.lua");
 
             if (_status != ThreadStatus.LUA_OK)
             {
-                Debug.LogError(_lua.ToString(-1));
+                string s = _lua.ToString(-1);
+                Debug.LogError(s); LuaScripting.Instance.AddPrintLog(s);
                 scriptOk = false;
             }
 
@@ -207,6 +218,9 @@ namespace LuaScripting
             {
                 windowRect = GUI.Window(84475229, windowRect, DoWindow, "Lua Scripting");
 
+                if (printLog.Count > 0)
+                    consoleWindowRect = GUI.Window(534754242, consoleWindowRect, ConsoleWindow, "Log");
+
                 if (BlockMapper.CurrentInstance && BlockMapper.CurrentInstance.IsBlock && BlockMapper.CurrentInstance.Block.MapperTypes.Count > 0)
                 {
                     Rect inspectorRect = windowRect;
@@ -232,6 +246,11 @@ namespace LuaScripting
                 GUI.Label(new Rect(155, 30 + 30 * i + 24, 135, 20), $"{mt.Key}");
                 i++;
             }
+        }
+
+        private void DoGroupRename(int uselessId)
+        {
+
         }
 
         private void DoWindow(int uselessId)
@@ -263,6 +282,15 @@ namespace LuaScripting
                 ModIO.OpenFolderInFileBrowser("Doc");
             }
 
+            GUI.DragWindow();
+        }
+
+        private void ConsoleWindow(int uslsId)
+        {
+            string result = string.Join("\n", printLog.Reverse().ToArray());
+            consoleWindowScrollPos = GUI.BeginScrollView(new Rect(10, 54, 500 - 10 - 10, 600 - 54 - 10), consoleWindowScrollPos, new Rect(0, 0, 500 - 40, printLog.Count * 18));
+            GUI.TextArea(new Rect(0, 0, 500 - 20, printLog.Count * 18), result);
+            GUI.EndScrollView();
             GUI.DragWindow();
         }
 
@@ -306,8 +334,8 @@ namespace LuaScripting
         {
             if (markForLoadFromMachine)
             {
-                Mod.LoadLuaRootFromMachine();
                 markForLoadFromMachine = false;
+                Mod.LoadLuaRootFromMachine();
             }
 
             if (!Machine.Active())
@@ -333,7 +361,10 @@ namespace LuaScripting
                                 _lua.PushString(text);
 
                                 if (_lua.PCall(2, 0, 0) != ThreadStatus.LUA_OK)
+                                {
                                     Debug.LogError(_lua.ToString(-1));
+                                    LuaScripting.Instance.AddPrintLog(_lua.ToString(-1));
+                                }
                             }
                         }
                     }
@@ -367,6 +398,13 @@ namespace LuaScripting
             return _lua.L_Ref(LuaDef.LUA_REGISTRYINDEX);
         }
 
+        internal void AddPrintLog(string v)
+        {
+            if (printLog.Count > 300)
+                printLog.Dequeue();
+            printLog.Enqueue(v);
+        }
+
         private void CallLuaMethod(int funcRef)
         {
             _lua.RawGetI(LuaDef.LUA_REGISTRYINDEX, funcRef);
@@ -380,7 +418,7 @@ namespace LuaScripting
             if (status != ThreadStatus.LUA_OK)
             {
                 scriptOk = false;
-                Debug.LogError(_lua.ToString(-1));
+                Debug.LogError(_lua.ToString(-1)); LuaScripting.Instance.AddPrintLog(_lua.ToString(-1));
             }
 
             // remove `traceback' function

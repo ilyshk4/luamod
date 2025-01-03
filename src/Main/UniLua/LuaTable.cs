@@ -18,11 +18,6 @@ namespace UniLua
             InitLuaTable(l);
         }
 
-        ~LuaTable()
-        {
-            Recycle();
-        }
-
         public StkId Get(ref TValue key)
         {
             if (key.Tt == (int) LuaType.LUA_TNIL) { return TheNilValue; }
